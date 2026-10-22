@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Portal Virtual Reality & Metaverse | TI FTS UIKA Bogor</title>
+  <meta name="description" content="Gerbang Masuk Aplikasi Virtual Reality dan Metaverse Spasial 3D - Program Studi Teknik Informatika, Fakultas Teknik dan Sains, Universitas Ibn Khaldun Bogor.">
+  <meta name="author" content="Teknik Informatika FTS UIKA Bogor">
+  <meta name="theme-color" content="#0B0F19">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #7C00FF;
+      --primary-glow: rgba(124, 0, 255, 0.45);
+      --secondary: #E600D7;
+      --secondary-glow: rgba(230, 0, 215, 0.4);
+      --cyan: #00F0FF;
+      --cyan-glow: rgba(0, 240, 255, 0.35);
+      --emerald: #10B981;
+      --bg-dark: #07090E;
+      --bg-card: rgba(15, 23, 42, 0.65);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --card-border-hover: rgba(168, 85, 247, 0.6);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Interactive Cyber Particles Canvas */
+    #bgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Ambient Glow Blobs */
+    .glow-blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .blob-1 {
+      top: -10%;
+      left: -5%;
+      width: 50vw;
+      height: 50vw;
+      background: var(--primary);
+    }
+    .blob-2 {
+      bottom: -15%;
+      right: -10%;
+      width: 55vw;
+      height: 55vw;
+      background: var(--secondary);
+    }
+    .blob-3 {
+      top: 40%;
+      right: 25%;
+      width: 30vw;
+      height: 30vw;
+      background: var(--cyan);
+      opacity: 0.15;
+    }
+
+    /* Layout Wrapper */
+    .app-container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 1.5rem 1.5rem 2.5rem;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Header Nav */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 1.4rem;
+      color: #fff;
+      box-shadow: 0 0 25px var(--primary-glow);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .brand-icon::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%);
+      transform: rotate(30deg);
+      animation: shine 6s infinite;
+    }
+    @keyframes shine {
+      0% { transform: translateX(-150%) rotate(30deg); }
+      20%, 100% { transform: translateX(150%) rotate(30deg); }
+    }
+
+    .brand-meta h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #ffffff, #e2e8f0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-meta p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .server-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 1.1rem;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      backdrop-filter: blur(12px);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--emerald);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Sound Control Button */
+    .sound-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      padding: 0.5rem 0.85rem;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.25s ease;
+    }
+    .sound-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Hero Headline */
+    .hero {
+      text-align: center;
+      margin: 3.5rem auto 3rem;
+      max-width: 820px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      background: rgba(124, 0, 255, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      color: #D8B4FE;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.2rem;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #A855F7 0%, #E600D7 50%, #00F0FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+      color: var(--text-muted);
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3.5rem;
+      perspective: 1000px;
+    }
+
+    /* VR Card Styling */
+    .vr-card {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 2.2rem 2rem 2rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .vr-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      padding: 1.5px;
+      background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.15) 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .vr-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      border-color: var(--card-border-hover);
+      box-shadow: 0 25px 50px -12px rgba(124, 0, 255, 0.25), 0 0 30px rgba(124, 0, 255, 0.15);
+    }
+
+    /* Card Glow Gradient Header */
+    .card-glow-bg {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .card-lab .card-glow-bg {
+      background: var(--primary);
+    }
+    .card-jelajah .card-glow-bg {
+      background: var(--cyan);
+    }
+    .vr-card:hover .card-glow-bg {
+      opacity: 0.35;
+    }
+
+    .card-top {
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-badges {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .badge-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .badge-purple {
+      background: rgba(124, 0, 255, 0.2);
+      color: #C084FC;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+    }
+    .badge-cyan {
+      background: rgba(0, 240, 255, 0.15);
+      color: #67E8F9;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+    .badge-gold {
+      background: rgba(234, 179, 8, 0.15);
+      color: #FDE047;
+      border: 1px solid rgba(234, 179, 8, 0.35);
+    }
+
+    .card-icon-wrap {
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+    .card-lab .card-icon-wrap {
+      background: linear-gradient(135deg, rgba(124, 0, 255, 0.8), rgba(230, 0, 215, 0.8));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .card-jelajah .card-icon-wrap {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(2, 132, 199, 0.8));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .vr-card:hover .card-icon-wrap {
+      transform: scale(1.08) rotate(3deg);
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+      color: #fff;
+    }
+
+    .card-subtitle {
+      font-size: 0.85rem;
+      color: #A855F7;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .card-jelajah .card-subtitle {
+      color: #38BDF8;
+    }
+
+    .card-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-bottom: 2rem;
+    }
+
+    .card-features li {
+      font-size: 0.85rem;
+      color: #CBD5E1;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .card-features li svg {
+      width: 16px;
+      height: 16px;
+      color: var(--emerald);
+      flex-shrink: 0;
+    }
+
+    /* Launch Button */
+    .btn-launch {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 1.1rem 1.75rem;
+      border-radius: 18px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      overflow: hidden;
+      border: none;
+      z-index: 2;
+    }
+
+    .btn-purple {
+      background: linear-gradient(135deg, var(--primary) 0%, #A855F7 100%);
+      box-shadow: 0 8px 24px -4px var(--primary-glow);
+    }
+    .btn-purple:hover {
+      box-shadow: 0 12px 32px var(--primary-glow);
+      filter: brightness(1.15);
+      transform: translateY(-2px);
+    }
+
+    .btn-cyan {
+      background: linear-gradient(135deg, #0284C7 0%, #00F0FF 100%);
+      color: #07090E;
+      box-shadow: 0 8px 24px -4px var(--cyan-glow);
+    }
+    .btn-cyan:hover {
+      box-shadow: 0 12px 32px var(--cyan-glow);
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+    }
+
+    .btn-launch .arrow {
+      transition: transform 0.25s ease;
+    }
+    .btn-launch:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    .path-hint {
+      text-align: center;
+      margin-top: 0.75rem;
+      font-size: 0.72rem;
+      color: #64748B;
+      font-family: monospace;
+    }
+
+    /* Device Support Bar */
+    .device-bar {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+      backdrop-filter: blur(16px);
+    }
+
+    .device-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      color: #CBD5E1;
+      font-weight: 500;
+    }
+
+    .device-icon {
+      font-size: 1.3rem;
+      background: rgba(255, 255, 255, 0.05);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      color: #64748B;
+      font-size: 0.82rem;
+    }
+
+    footer a {
+      color: #A855F7;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    footer a:hover {
+      color: #E600D7;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .app-container {
+        padding: 1rem 1rem 2rem;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .server-status-pill {
+        align-self: flex-start;
+      }
+      .hero {
+        margin: 2.5rem auto 2.2rem;
+      }
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+      .device-bar {
+        justify-content: flex-start;
+        padding: 1rem 1.2rem;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glow Blobs -->
+  <div class="glow-blob blob-1"></div>
+  <div class="glow-blob blob-2"></div>
+  <div class="glow-blob blob-3"></div>
+
+  <!-- Interactive Particles Canvas -->
+  <canvas id="bgCanvas"></canvas>
+
+  <div class="app-container">
+
+    <!-- Header Navigation -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">VR</div>
+        <div class="brand-meta">
+          <h2>Teknik Informatika FTS</h2>
+          <p>Universitas Ibn Khaldun (UIKA) Bogor</p>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap: 0.75rem;">
+        <button id="soundToggle" class="sound-btn" title="Aktifkan / Nonaktifkan Efek Suara">
+          <span id="soundIcon">🔊</span>
+          <span id="soundText">SFX: On</span>
+        </button>
+
+        <div class="server-status-pill">
+          <span class="status-dot"></span>
+          <span>Online · vr.ti.fts.uika-bogor.ac.id</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Header -->
+    <main>
+      <section class="hero">
+        <div class="hero-badge">
+          <span>✨ Metaverse & Virtual Reality Gateway</span>
+        </div>
+        <h1>Pilih Destinasi <span class="gradient-text">Eksplorasi VR</span></h1>
+        <p>Selamat datang di portal virtual Program Studi S1 Teknik Informatika UIKA Bogor. Silakan pilih ruang virtual atau metaverse spasial 3D yang ingin Anda jelajahi di bawah ini.</p>
+      </section>
+
+      <!-- VR Applications Selection Cards -->
+      <section class="cards-grid">
+
+        <!-- Card 1: VR Lab Peminatan TI -->
+        <article class="vr-card card-lab" id="cardLab">
+          <div class="card-glow-bg"></div>
+          <div class="card-top">
+            <div class="card-badges">
+              <span class="badge-tag badge-purple">Lab Virtual 360°</span>
+              <span class="badge-tag badge-gold">TI UIKA Bogor</span>
+            </div>
+            <div class="card-icon-wrap">
+              🖥️
+            </div>
+            <h2 class="card-title">VR Lab Peminatan TI</h2>
+            <div class="card-subtitle">
+              <span>🏛️ Fakultas Teknik & Sains UIKA</span>
+            </div>
+            <p class="card-desc">
+              Jelajahi 4 laboratorium peminatan S1 Teknik Informatika secara virtual 360°: Software Engineering (SE), KERIS (AI & Intelligent System), Computer System Network (CSN), dan Geospasial Information Teknologi (GIT).
+            </p>
+            <ul class="card-features">
+              <li>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <span>Tur Interaktif 4 Ruang Laboratorium Riset</span>
+              </li>
+              <li>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <span>Informasi Fokus Penelitian & Showcase Karya</span>
+              </li>
+              <li>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <span>Navigasi Sudut Pandang Panoramik 360 Derajat</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <!-- Link ke aplikasi existing lab-peminatan-vr -->
+            <a href="/lab-peminatan-vr/" class="btn-launch btn-purple" id="btnLab">
+              <span>Masuk Lab Peminatan VR</span>
+              <span class="arrow">→</span>
+            </a>
+            <div class="path-hint">Subpath: /lab-peminatan-vr/</div>
+          </div>
+        </article>
+
+        <!-- Card 2: Jelajah Keajaiban Alam (Metaverse Spasial 3D) -->
+        <article class="vr-card card-jelajah" id="cardJelajah">
+          <div class="card-glow-bg"></div>
+          <div class="card-top">
+            <div class="card-badges">
+              <span class="badge-tag badge-cyan">Metaverse Spasial 3D</span>
+              <span class="badge-tag badge-gold">KRN & TI UIKA</span>
+            </div>
+            <div class="card-icon-wrap">
+              🌍
+            </div>
+            <h2 class="card-title">Jelajah Keajaiban Alam</h2>
+            <div class="card-subtitle">
+              <span>🎮 25 Keajaiban Alam Dunia · 8 Ruang Spasial</span>
+            </div>
+            <p class="card-desc">
+              Media pembelajaran metaverse 3D bergaya Roblox. Siswa menjelajahi 8 ruang pulau terapung, menonton 25 layar bioskop alam 3D, menjawab kuis interaktif, tadabbur ayat Al-Qur'an, dan membuka Harta Karun.
+            </p>
+            <ul class="card-features">
+              <li>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <span>Avatar 3D Kustom & Kontrol WASD / Joystick</span>
+              </li>
+              <li>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <span>25 Klip Video 3D, Audio Ayat & Pemandu Kiki</span>
+              </li>
+              <li>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <span>Sistem Poin 💎, Paspor Stempel & Piagam PNG</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <!-- Link ke aplikasi jelajah -->
+            <a href="/jelajah/" class="btn-launch btn-cyan" id="btnJelajah">
+              <span>Mulai Jelajah Alam 3D</span>
+              <span class="arrow">→</span>
+            </a>
+            <div class="path-hint">Subpath: /jelajah/</div>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- Multi-Device Compatibility Strip -->
+      <section class="device-bar">
+        <div class="device-item">
+          <div class="device-icon">💻</div>
+          <div>
+            <strong style="display:block; color:#fff;">Laptop / PC</strong>
+            <span style="font-size:0.75rem; color:#94A3B8;">Keyboard W-A-S-D & Mouse</span>
+          </div>
+        </div>
+
+        <div class="device-item">
+          <div class="device-icon">📱</div>
+          <div>
+            <strong style="display:block; color:#fff;">Smartphone & Tablet</strong>
+            <span style="font-size:0.75rem; color:#94A3B8;">Touchscreen Joystick Virtual</span>
+          </div>
+        </div>
+
+        <div class="device-item">
+          <div class="device-icon">🥽</div>
+          <div>
+            <strong style="display:block; color:#fff;">VR Headset & Browser</strong>
+            <span style="font-size:0.75rem; color:#94A3B8;">WebXR / Fullscreen Immersive</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2026 <strong>Program Studi Teknik Informatika</strong> — Fakultas Teknik & Sains, <a href="https://uika-bogor.ac.id" target="_blank" rel="noopener">Universitas Ibn Khaldun Bogor</a>.</p>
+      <p style="margin-top: 0.35rem; font-size: 0.75rem;">Jl. KH. Sholeh Iskandar Km. 2, Kedungbadak, Tanah Sareal, Kota Bogor, Jawa Barat 16162</p>
+    </footer>
+
+  </div>
+
+  <!-- Audio Synth & Interactive Canvas Logic -->
+  <script>
+    // ---------- Web Audio API Synthesizer (No External Audio Files) ----------
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSfx(type) {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'hover') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+        gain.gain.setValueAtTime(0.04, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'click') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.06); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.12); // G5
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.22);
+        osc.start(now);
+        osc.stop(now + 0.22);
+      }
+    }
+
+    // Toggle Sound
+    const soundToggle = document.getElementById('soundToggle');
+    const soundIcon = document.getElementById('soundIcon');
+    const soundText = document.getElementById('soundText');
+
+    soundToggle.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      soundIcon.textContent = soundEnabled ? '🔊' : '🔇';
+      soundText.textContent = soundEnabled ? 'SFX: On' : 'SFX: Off';
+      if (soundEnabled) playSfx('click');
+    });
+
+    // Attach hover & click sound to cards and buttons
+    const interactiveElements = document.querySelectorAll('.vr-card, .btn-launch, .sound-btn');
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', () => playSfx('hover'));
+      el.addEventListener('click', () => playSfx('click'));
+    });
+
+    // ---------- Interactive Particle Cyber-Grid Canvas ----------
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let w = (canvas.width = window.innerWidth);
+    let h = (canvas.height = window.innerHeight);
+
+    window.addEventListener('resize', () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+    const PARTICLE_COUNT = Math.min(65, Math.floor((w * h) / 18000));
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * w;
+        this.y = Math.random() * h;
+        this.vx = (Math.random() - 0.5) * 0.6;
+        this.vy = (Math.random() - 0.5) * 0.6;
+        this.radius = Math.random() * 1.8 + 0.6;
+        this.alpha = Math.random() * 0.5 + 0.2;
+        this.hue = Math.random() > 0.5 ? 275 : 190; // Violet or Cyan
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > w) this.vx *= -1;
+        if (this.y < 0 || this.y > h) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${this.hue}, 100%, 75%, ${this.alpha})`;
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push(new Particle());
+    }
+
+    // Connect particles with subtle cyber lines
+    function drawLines() {
+      const maxDist = 130;
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < maxDist) {
+            const alpha = (1 - dist / maxDist) * 0.16;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(168, 85, 247, ${alpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      drawLines();
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
