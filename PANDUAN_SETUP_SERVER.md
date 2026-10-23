@@ -1,132 +1,136 @@
 # 🚀 Panduan Setup Lokal & Deploy Server VR TI FTS UIKA Bogor
+### Domain: `https://vr.ti.fts.uika-bogor.ac.id/`
 
-Dokumentasi lengkap untuk menjalankan aplikasi secara lokal dan persiapan deployment ke server **`vr.ti.fts.uika-bogor.ac.id`**.
+Panduan ini mencakup pengelolaan **3 Aplikasi VR & Metaverse** dalam satu server yang sama:
+1. 🏛️ **VR Lab Peminatan TI** (Aplikasi WebRTC/Socket existing - Port `8080`)
+2. 🌍 **Metaverse Jelajah Keajaiban Alam** (Web 3D Three.js Statis - Subpath `/jelajah/`)
+3. 🏬 **Virtual Mall Botani Square 3D** (`virtual-mall-botani` - Node.js + WebSocket Port `8090` - Subpath `/botani/`)
 
 ---
 
-## 📂 Struktur Target di Server (`/var/www`)
+## 📂 1. Struktur Folder di Server (`/var/www`)
 
-Di server `root@server-vr-ti:/var/www#`, struktur folder yang ideal adalah:
+Di server `root@server-vr-ti:/var/www#`, susunan foldernya adalah:
 
 ```text
 /var/www/
-├── html/                     <-- Berisi index.html gerbang awal (Portal Pilihan VR)
-├── lab-peminatan-vr/         <-- Aplikasi VR yang sudah ada
-└── jelajah/                  <-- Aplikasi Metaverse Jelajah Alam (index.html + folder klip/)
+├── html/                     <-- Berisi index.html Gerbang Awal (Portal 3 Pilihan VR)
+├── lab-peminatan-vr/         <-- Aplikasi VR Lab Peminatan existing (Port 8080)
+├── jelajah/                  <-- Aplikasi Metaverse Jelajah Alam (index.html + folder klip/)
+└── virtual-mall-botani/      <-- Aplikasi Virtual Mall Botani Square (server.js, public/, data/)
 ```
 
 ---
 
-## 1. 💻 Cara Setup & Menjalankan di Lokal (Development)
+## 💻 2. Setup Lokal untuk Virtual Mall Botani Square
 
-> ⚠️ **Penting:** Jangan membuka file `index.html` dengan klik ganda (*double click* / `file://`). Browser akan memblokir tekstur video 3D dan Web Audio API karena kebijakan keamanan CORS. Gunakan local HTTP server.
+Aplikasi `virtual-mall-botani` adalah aplikasi **Node.js** mandiri dengan dukungan WebSockets multi-user.
 
-Pilih salah satu cara termudah berikut dari terminal folder proyek:
-
-### Cara A: Menggunakan Python (Sudah terpasang di sistem Anda)
-Buka PowerShell / Terminal di folder ini (`d:\Repo\Metaverse-Jelajah Alam`):
-```bash
-python -m http.server 8000
-```
-Buka browser: **`http://localhost:8000`**
-
-### Cara B: Menggunakan Node.js / NPX
-```bash
-npx serve .
-# atau
-npx http-server -p 8000
-```
-
-### Cara C: Menggunakan Ekstensi VS Code
-Jika menggunakan VS Code, pasang ekstensi **Live Server**, klik kanan pada `index.html` lalu pilih **"Open with Live Server"**.
+### Langkah Menjalankan di Lokal:
+1. Buka folder proyek di terminal / PowerShell:
+   ```bash
+   cd "d:\Repo\virtualmall-botani v1\virtual-mall-botani"
+   ```
+2. Install dependency:
+   ```bash
+   npm install
+   ```
+3. Jalankan server:
+   ```bash
+   npm start
+   ```
+4. Buka di browser:
+   - **Mall 3D Pengunjung**: `http://localhost:8090`
+   - **Panel Admin Mall**: `http://localhost:8090/admin`
 
 ---
 
-## 2. 🌐 Persiapan Upload ke Server
+## 🌐 3. Proses Upload & Setup `virtual-mall-botani` ke Server
 
-Pastikan folder yang diunggah ke server mencakup:
-1. `index.html` (Aplikasi 3D Jelajah Alam)
-2. Folder `klip/` (Seluruh 26 file `.mp4`)
-
-### Langkah A: Upload Folder Proyek ke Server
-Dari komputer lokal, jalankan perintah `scp` atau `rsync` (atau gunakan FileZilla / WinSCP):
-
+### Langkah A: Upload Folder ke Server
+Dari komputer lokal, jalankan perintah `scp` (atau gunakan WinSCP / FileZilla):
 ```bash
-# Contoh menggunakan SCP dari PowerShell/CMD:
-scp -r "d:\Repo\Metaverse-Jelajah Alam\*" root@server-vr-ti:/var/www/jelajah/
-```
-*Atau buat folder `/var/www/jelajah` terlebih dahulu di server:*
-```bash
-# Di server:
-mkdir -p /var/www/jelajah
+# Upload folder virtual-mall-botani ke server
+scp -r "d:\Repo\virtualmall-botani v1\virtual-mall-botani" root@server-vr-ti:/var/www/virtual-mall-botani
 ```
 
-### Langkah B: Pasang Gerbang Awal (Portal Gateway)
-File `portal/index.html` (atau `gateway-index.html`) yang telah dibuat berfungsi sebagai portal pemilihan VR.
-Copy file tersebut ke document root utama server:
+### Langkah B: Install Dependency & Jalankan di Server
+Masuk ke terminal server (`root@server-vr-ti`):
+```bash
+cd /var/www/virtual-mall-botani
+npm install
 
+# Jalankan service di background menggunakan PM2 agar otomatis hidup kembali saat server restart:
+npm install -g pm2
+pm2 start server.js --name "mall-botani"
+pm2 save
+pm2 startup
+```
+
+> 💡 **Cek Status Service:**
+> ```bash
+> pm2 status
+> # Cek log jika ada kendala:
+> pm2 logs mall-botani
+> ```
+
+### Langkah C: Atur Hak Akses File (Permissions)
+```bash
+chown -R www-data:www-data /var/www/virtual-mall-botani
+chmod -R 755 /var/www/virtual-mall-botani
+```
+
+---
+
+## 🚪 4. Update Gerbang Awal (Portal `index.html`)
+
+File [portal/index.html](file:///d:/Repo/Metaverse-Jelajah%20Alam/portal/index.html) (atau [gateway-index.html](file:///d:/Repo/Metaverse-Jelajah%20Alam/gateway-index.html)) sudah diperbarui dengan **3 kartu VR interaktif** (termasuk Virtual Mall Botani Square).
+
+Upload dan pasang ke document root `/var/www/html/index.html`:
 ```bash
 # Di server:
 cp /var/www/jelajah/gateway-index.html /var/www/html/index.html
-```
-
-### Langkah C: Atur Hak Akses File (Permissions)
-Di server Ubuntu/Debian, berikan izin ke user web server (`www-data`):
-
-```bash
-chown -R www-data:www-data /var/www/jelajah
-chmod -R 755 /var/www/jelajah
-chown -R www-data:www-data /var/www/html
-chmod -R 755 /var/www/html
+chown www-data:www-data /var/www/html/index.html
 ```
 
 ---
 
-## 3. ⚙️ Konfigurasi Web Server (Nginx)
+## ⚙️ 5. Konfigurasi Lengkap Nginx di Server
 
-Buka file konfigurasi Nginx untuk domain `vr.ti.fts.uika-bogor.ac.id`:
+Buka file konfigurasi Nginx di server:
 ```bash
 nano /etc/nginx/sites-available/vr.ti.fts.uika-bogor.ac.id
-# atau di: /etc/nginx/sites-available/default
 ```
 
-Pastikan blok server berisi routing berikut:
+Ganti seluruh isinya dengan konfigurasi terintegrasi berikut:
 
 ```nginx
 server {
-    listen 80;
-    listen 443 ssl http2;
     server_name vr.ti.fts.uika-bogor.ac.id;
+    client_max_body_size 100M;
 
-    # Dokumen root utama untuk Gerbang Awal
-    root /var/www/html;
-    index index.html;
-
-    # 1. GERBANG AWAL (PORTAL)
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
-    # 2. APLIKASI VR 1: LAB PEMINATAN
-    location = /lab-peminatan-vr {
-        return 301 /lab-peminatan-vr/;
-    }
-    location /lab-peminatan-vr/ {
-        alias /var/www/lab-peminatan-vr/;
+    # ================================================================
+    # 1. GERBANG AWAL (PORTAL 3 VR) PADA HALAMAN UTAMA (/)
+    # ================================================================
+    location = / {
+        root /var/www/html;
         index index.html;
-        try_files $uri $uri/ =404;
+        try_files /index.html =404;
     }
 
-    # 3. APLIKASI VR 2: JELAJAH KEAJAIBAN ALAM
+    # ================================================================
+    # 2. APLIKASI VR 1: JELAJAH KEAJAIBAN ALAM (Subpath /jelajah/)
+    # ================================================================
     location = /jelajah {
         return 301 /jelajah/;
     }
+
     location /jelajah/ {
         alias /var/www/jelajah/;
         index index.html;
         try_files $uri $uri/ =404;
 
-        # Optimasi streaming potongan film video 3D
+        # Optimasi streaming video 3D mp4
         location ~* \.mp4$ {
             add_header Accept-Ranges bytes;
             mp4;
@@ -136,21 +140,113 @@ server {
             add_header Cache-Control "public, no-transform";
         }
     }
+
+    # ================================================================
+    # 3. APLIKASI VR 2: VIRTUAL MALL BOTANI SQUARE (Subpath /botani/)
+    # Port Backend: 8090
+    # ================================================================
+    location = /botani {
+        return 301 /botani/;
+    }
+
+    location /botani/ {
+        # Tanda slash "/" di akhir WAJIB untuk me-rewrite path ke root port 8090
+        proxy_pass http://127.0.0.1:8090/;
+        proxy_http_version 1.1;
+
+        # WebSocket wajib untuk pergerakan avatar, chat, dan WebRTC voice
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+
+        proxy_redirect / /botani/;
+    }
+
+    # ================================================================
+    # 4. APLIKASI VR 3: LAB PEMINATAN TI (Subpath /lab-peminatan-vr/)
+    # Port Backend: 8080
+    # ================================================================
+    location = /lab-peminatan-vr {
+        return 301 /lab-peminatan-vr/;
+    }
+
+    location /lab-peminatan-vr/ {
+        proxy_pass http://127.0.0.1:8080/;
+        proxy_http_version 1.1;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+
+        proxy_redirect / /lab-peminatan-vr/;
+    }
+
+    # ================================================================
+    # 5. FALLBACK PROXY UNTUK ASSETS UMUM PORT 8080
+    # ================================================================
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/vr.ti.fts.uika-bogor.ac.id/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/vr.ti.fts.uika-bogor.ac.id/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    if ($host = vr.ti.fts.uika-bogor.ac.id) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80;
+    listen [::]:80;
+    server_name vr.ti.fts.uika-bogor.ac.id;
+    return 404; # managed by Certbot
 }
 ```
 
-Uji dan reload Nginx:
+Uji dan reload Nginx di server:
 ```bash
-nginx -t
-systemctl reload nginx
+nginx -t && systemctl reload nginx
 ```
 
 ---
 
-## 4. 🔗 Skema URL Hasil Akhir
+## 🔗 6. Peta URL Hasil Akhir di Server
 
-| Halaman | URL | Keterangan |
+| Tujuan | URL Akses | Tipe Layanan |
 |---|---|---|
-| **Gerbang Awal (Portal)** | `https://vr.ti.fts.uika-bogor.ac.id/` | Memilih aplikasi VR yang mau dibuka |
-| **VR Lab Peminatan TI** | `https://vr.ti.fts.uika-bogor.ac.id/lab-peminatan-vr/` | Aplikasi VR Lab Peminatan yang sudah ada |
-| **Jelajah Alam 3D** | `https://vr.ti.fts.uika-bogor.ac.id/jelajah/` | Metaverse 3D Spasial Jelajah Keajaiban Alam |
+| 🚪 **Gerbang Awal (Portal 3 VR)** | `https://vr.ti.fts.uika-bogor.ac.id/` | File Statis `/var/www/html/index.html` |
+| 🌍 **Metaverse Jelajah Alam** | `https://vr.ti.fts.uika-bogor.ac.id/jelajah/` | File Statis Three.js + MP4 `/var/www/jelajah/` |
+| 🏬 **Virtual Mall Botani Square** | `https://vr.ti.fts.uika-bogor.ac.id/botani/` | Node.js + WebSocket (Port `8090`) |
+| 🔑 **Admin Mall Botani** | `https://vr.ti.fts.uika-bogor.ac.id/botani/admin` | Panel Admin Mall Botani |
+| 🏛️ **VR Lab Peminatan TI** | `https://vr.ti.fts.uika-bogor.ac.id/lab-peminatan-vr/` | Node.js + WebSocket (Port `8080`) |

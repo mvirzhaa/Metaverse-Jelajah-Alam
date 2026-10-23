@@ -328,6 +328,9 @@
     .card-jelajah .card-glow-bg {
       background: var(--cyan);
     }
+    .card-botani .card-glow-bg {
+      background: #F59E0B;
+    }
     .vr-card:hover .card-glow-bg {
       opacity: 0.35;
     }
@@ -390,6 +393,10 @@
       background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(2, 132, 199, 0.8));
       border: 1px solid rgba(255, 255, 255, 0.25);
     }
+    .card-botani .card-icon-wrap {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.85), rgba(234, 88, 12, 0.85));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
     .vr-card:hover .card-icon-wrap {
       transform: scale(1.08) rotate(3deg);
     }
@@ -414,6 +421,9 @@
     }
     .card-jelajah .card-subtitle {
       color: #38BDF8;
+    }
+    .card-botani .card-subtitle {
+      color: #FBBF24;
     }
 
     .card-desc {
@@ -484,6 +494,17 @@
     }
     .btn-cyan:hover {
       box-shadow: 0 12px 32px var(--cyan-glow);
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+    }
+
+    .btn-amber {
+      background: linear-gradient(135deg, #F59E0B 0%, #EA580C 100%);
+      color: #fff;
+      box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.45);
+    }
+    .btn-amber:hover {
+      box-shadow: 0 12px 32px rgba(245, 158, 11, 0.55);
       filter: brightness(1.1);
       transform: translateY(-2px);
     }
@@ -718,6 +739,50 @@
               <span class="arrow">→</span>
             </a>
             <div class="path-hint">Subpath: /jelajah/</div>
+          </div>
+        </article>
+
+        <!-- Card 3: Virtual Mall Botani Square (3D Metaverse) -->
+        <article class="vr-card card-botani" id="cardBotani">
+          <div class="card-glow-bg"></div>
+          <div class="card-top">
+            <div class="card-badges">
+              <span class="badge-tag badge-gold">Multi-User 3D Mall</span>
+              <span class="badge-tag badge-purple">WebSockets & Voice</span>
+            </div>
+            <div class="card-icon-wrap">
+              🏬
+            </div>
+            <h2 class="card-title">Virtual Mall Botani Square</h2>
+            <div class="card-subtitle">
+              <span>🛍️ Mal 3D 4 Lantai · Toko & Audio WebRTC</span>
+            </div>
+            <p class="card-desc">
+              Dunia metaverse 3D mal Botani Square Bogor multi-user real-time. Jelajahi 4 lantai gedung (B, L, 1, 2), eskalator berjalan, 2 lift interaktif, tenant toko dengan TV videotron, dan katalog produk.
+            </p>
+            <ul class="card-features">
+              <li>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <span>4 Lantai Gedung (B, L, 1, 2) & Lift Interaktif</span>
+              </li>
+              <li>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <span>Multi-Player Avatar, Chat, Emoji & Voice WebRTC</span>
+              </li>
+              <li>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <span>Tenant Toko, Display Produk & TV Videotron</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <!-- Link ke aplikasi virtual mall botani -->
+            <a href="/botani/" class="btn-launch btn-amber" id="btnBotani">
+              <span>Masuk Virtual Mall 3D</span>
+              <span class="arrow">→</span>
+            </a>
+            <div class="path-hint">Subpath: /botani/</div>
           </div>
         </article>
 
